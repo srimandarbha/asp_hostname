@@ -17,7 +17,7 @@ sysctl = '/etc/sysctl.conf'
 file sysctl do
    action :create
    regex = /^kernel\.hostname=.*/
-   newline = "kernel.hostname=#{node['aspect_hostname']}"
+   newline = "kernel.hostname=#{node['set_fqdn']}"
    content lazy {
      original = ::IO.read(sysctl)
      original.match(regex) ? original.gsub(regex, newline) : original + newline
@@ -27,13 +27,13 @@ file sysctl do
    notifies :restart, 'service[network]', :delayed
 end
 
-execute "hostname #{node['aspect_hostname']}" do
-   only_if { node['hostname'] != node['aspect_hostname'] }
+execute "hostname #{node['set_fqdn']}" do
+   only_if { node['hostname'] != node['set_fqdn'] }
    notifies :reload, 'ohai[reload_hostname]', :immediately
 end
 
 file '/etc/hostname' do
-   content "#{node['aspect_hostname']}\n"
+   content "#{node['set_fqdn']}\n"
    mode '0644'
    only_if { ::File.exist?('/etc/hostname') }
    notifies :reload, 'ohai[reload_hostname]', :immediately
