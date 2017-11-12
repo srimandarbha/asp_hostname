@@ -11,9 +11,12 @@ fqdn = node['set_fqdn']
 
 Chef::Log.warn("SET_FQDN ATTRIBUTE IS NOT SET. PLEASE USE SET_FQDN ATTRIBUTE TO DEFINE THE HOSTNAME") if fqdn.nil?
 
-if fqdn
-   re=/(\w+{1})\.(.*{2})/
-   node.default['aspect_hostname'] = re.match(fqdn)[1]
+#if fqdn
+   #re=/(\w+{1})\.(.*{2})/
+   #node.default['aspect_hostname'] = re.match(fqdn)[1]
+hcount = fqdn.split('.').count if fqdn
+Chef::Log.warn("FQDN NOT SET PROPERLY. EX: HOSTNAME.DOMAINNAME.TLD or HOSTNAME.LOC.DOMAINNAME.TLD") if hcount <= 2
+
 
 include_recipe 'ohai'
 
@@ -38,4 +41,3 @@ case node['platform_family']
 		    include_recipe  'aspect_hostname::host_rhel_default'
 		end
  end
-end
