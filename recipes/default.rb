@@ -9,14 +9,11 @@
 
 fqdn = node['set_fqdn']
 
-Chef::Log.warn("SET_FQDN ATTRIBUTE IS NOT SET. PLEASE USE SET_FQDN ATTRIBUTE TO DEFINE THE HOSTNAME") if fqdn.nil?
+Chef::Application.fatal!("SET_FQDN ATTRIBUTE IS NOT SET. PLEASE USE SET_FQDN ATTRIBUTE TO DEFINE THE HOSTNAME") if fqdn.nil?
 
-#if fqdn
-   #re=/(\w+{1})\.(.*{2})/
-   #node.default['aspect_hostname'] = re.match(fqdn)[1]
-hcount = fqdn.split('.').count if fqdn
-Chef::Log.warn("FQDN NOT SET PROPERLY. EX: HOSTNAME.DOMAINNAME.TLD or HOSTNAME.LOC.DOMAINNAME.TLD") if hcount <= 2
-
+if fqdn
+   hcount = fqdn.split('.').count if fqdn
+   Chef::Application.fatal!("FQDN NOT SET PROPERLY. EX: HOSTNAME.DOMAINNAME.TLD or HOSTNAME.LOC.DOMAINNAME.TLD") if hcount <= 2
 
 include_recipe 'ohai'
 
@@ -33,11 +30,5 @@ case node['platform_family']
 	      else
 		    include_recipe  'aspect_hostname::host_rhel_default'
        end
-	when 'debian'
-		case node['platform_version']
-		  when /^16/
-		    include_recipe  'aspect_hostname::host_rhel_7'
-		  else
-		    include_recipe  'aspect_hostname::host_rhel_default'
-		end
- end
+    end
+end
